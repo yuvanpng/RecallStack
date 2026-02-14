@@ -1,16 +1,66 @@
-# React + Vite
+# 🚀 RecallStack
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**RecallStack** is a productivity-focused spaced repetition platform designed to help developers master Data Structures & Algorithms through structured active recall and adaptive review scheduling.
 
-Currently, two official plugins are available:
+It transforms DSA practice into a long-term retention system.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 🧠 Why RecallStack?
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Most developers solve problems… and forget them.
 
-## Expanding the ESLint configuration
+RecallStack ensures:
+- Problems are revisited at optimal intervals  
+- Weak areas are reinforced frequently  
+- Strong concepts fade naturally but never disappear  
+- Learning becomes systematic, not random  
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## ✨ Core Features
+
+- 📌 Add and track DSA problems
+- 🔁 Automated spaced repetition (4 → 8 → 16 → 32 days…)
+- 🧩 Active recall-first review system
+- 💪 Weak / Medium / Strong performance tracking
+- 📅 Upcoming reviews (30-day preview)
+- 🔥 Heatmap review analytics
+- 📊 Performance stats dashboard
+- 📁 CSV export
+- 🔍 Sortable & filterable problem table
+
+---
+
+## 🛠 Tech Stack
+
+**Frontend**
+- React (Vite)
+- JavaScript
+
+**Backend**
+- Supabase (PostgreSQL + Auth)
+
+**Deployment**
+- Vercel
+
+---
+
+## ⚙️ How the Review Engine Works
+
+Each problem follows an adaptive interval model:
+
+| Recall Quality | Interval Update |
+|---------------|----------------|
+| Strong        | Interval × 2   |
+| Medium        | Interval × 1.5 |
+| Weak          | Reset to 4 days |
+
+Problems continue reappearing until consistently marked **Strong**, ensuring durable retention.
+
+---
+
+## 🔐 Environment Variables
+
+Create a `.env` file in the root directory:
+
