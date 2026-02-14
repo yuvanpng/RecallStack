@@ -59,8 +59,3 @@ Each problem follows an adaptive interval model:
 Problems continue reappearing until consistently marked **Strong**, ensuring durable retention.
 
 ---
-
-## 🔐 Environment Variables
-
-Create a `.env` file in the root directory:
-
