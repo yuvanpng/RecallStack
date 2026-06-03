@@ -1151,3 +1151,596 @@ tbody tr:hover {
     font-size: 0.8rem;
   }
 }
+
+/* ============================================================
+   NEW RATING BUTTONS
+   ============================================================ */
+.btn-easy-recall {
+  background: var(--green-bg);
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.btn-easy-recall:hover {
+  background: rgba(63, 185, 80, 0.25);
+}
+
+.btn-hard-recall {
+  background: var(--yellow-bg);
+  border-color: var(--yellow);
+  color: var(--yellow);
+}
+
+.btn-hard-recall:hover {
+  background: rgba(210, 153, 34, 0.25);
+}
+
+.btn-forgot {
+  background: var(--red-bg);
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.btn-forgot:hover {
+  background: rgba(248, 81, 73, 0.25);
+}
+
+.btn-archive {
+  background: rgba(188, 140, 255, 0.15);
+  border-color: var(--purple);
+  color: var(--purple);
+}
+
+.btn-archive:hover {
+  background: rgba(188, 140, 255, 0.25);
+}
+
+/* ============================================================
+   NEW STRENGTH BADGES
+   ============================================================ */
+.strength-easy-recall {
+  background: var(--green-bg);
+  color: var(--green);
+}
+
+.strength-hard-recall {
+  background: var(--yellow-bg);
+  color: var(--yellow);
+}
+
+.strength-forgot {
+  background: var(--red-bg);
+  color: var(--red);
+}
+
+.strength-archived {
+  background: rgba(188, 140, 255, 0.15);
+  color: var(--purple);
+}
+
+/* ============================================================
+   TODAY'S MISSION SECTION
+   ============================================================ */
+.mission-header {
+  background: linear-gradient(135deg, rgba(88, 166, 255, 0.1), rgba(188, 140, 255, 0.08));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.mission-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.mission-breakdown {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.mission-breakdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.mission-breakdown-item .count {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.mission-breakdown-item.forgot .count {
+  color: var(--red);
+}
+
+.mission-breakdown-item.hard-recall .count {
+  color: var(--yellow);
+}
+
+.mission-breakdown-item.easy-recall .count {
+  color: var(--green);
+}
+
+.mission-stats {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+
+.mission-stats span {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.mission-queue-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.mission-queue-pill {
+  background: rgba(88, 166, 255, 0.12);
+  color: var(--accent);
+  padding: 0.3rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.mission-queue-pill.remaining {
+  background: rgba(139, 148, 158, 0.12);
+  color: var(--text-secondary);
+}
+
+/* ============================================================
+   MISSION PROGRESS BAR
+   ============================================================ */
+.mission-progress {
+  width: 100%;
+  height: 6px;
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+  margin-top: 0.75rem;
+  overflow: hidden;
+}
+
+.mission-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green), var(--accent));
+  border-radius: 3px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================================
+   SETTINGS POPOVER
+   ============================================================ */
+.settings-trigger {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.7rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.settings-trigger:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+
+.settings-popover {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  min-width: 260px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  z-index: 100;
+}
+
+.settings-popover h4 {
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.settings-popover .form-group {
+  margin-bottom: 0.75rem;
+}
+
+.settings-popover input[type='number'] {
+  width: 70px;
+  padding: 0.4rem 0.5rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.settings-popover input[type='number']:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+}
+
+/* ============================================================
+   PATTERNS PANEL
+   ============================================================ */
+.patterns-section {
+  margin-bottom: 1.5rem;
+}
+
+.patterns-section h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.pattern-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pattern-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: border-color 0.15s;
+}
+
+.pattern-item:hover {
+  border-color: var(--text-muted);
+}
+
+.pattern-rank {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  min-width: 1.5rem;
+}
+
+.pattern-name {
+  flex: 1;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.pattern-confidence {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 140px;
+}
+
+.pattern-confidence-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  overflow: hidden;
+  min-width: 80px;
+}
+
+.pattern-confidence-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.pattern-confidence-fill.low {
+  background: var(--red);
+}
+
+.pattern-confidence-fill.medium {
+  background: var(--yellow);
+}
+
+.pattern-confidence-fill.high {
+  background: var(--green);
+}
+
+.pattern-confidence-value {
+  font-size: 0.8rem;
+  font-weight: 700;
+  min-width: 35px;
+  text-align: right;
+}
+
+.pattern-confidence-value.low {
+  color: var(--red);
+}
+
+.pattern-confidence-value.medium {
+  color: var(--yellow);
+}
+
+.pattern-confidence-value.high {
+  color: var(--green);
+}
+
+.pattern-delete {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.2rem;
+  font-size: 0.85rem;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s;
+}
+
+.pattern-item:hover .pattern-delete {
+  opacity: 1;
+}
+
+.pattern-delete:hover {
+  color: var(--red);
+}
+
+.pattern-empty {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.add-pattern-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.add-pattern-row input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+}
+
+.add-pattern-row input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.patterns-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.75rem;
+}
+
+/* ============================================================
+   PATTERNS SELECTOR (AddProblemForm & EditModal)
+   ============================================================ */
+.pattern-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(188, 140, 255, 0.15);
+  color: var(--purple);
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: border-color 0.15s;
+}
+
+.pattern-chip.selected {
+  border-color: var(--purple);
+  background: rgba(188, 140, 255, 0.25);
+}
+
+.pattern-chip button {
+  background: none;
+  border: none;
+  color: var(--purple);
+  cursor: pointer;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* ============================================================
+   ARCHIVE STYLES
+   ============================================================ */
+.review-card.archived {
+  opacity: 0.6;
+  border-left-color: var(--purple);
+}
+
+.archived-badge {
+  background: rgba(188, 140, 255, 0.15);
+  color: var(--purple);
+  padding: 0.15rem 0.5rem;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+tr.archived-row {
+  opacity: 0.55;
+}
+
+tr.archived-row .td-title {
+  text-decoration: line-through;
+  text-decoration-color: var(--text-muted);
+}
+
+/* ============================================================
+   REVIEW CARD COMPLETION ANIMATION
+   ============================================================ */
+@keyframes reviewComplete {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+}
+
+.review-card.completing {
+  animation: reviewComplete 0.35s ease-out forwards;
+}
+
+/* ============================================================
+   STREAK ANIMATION
+   ============================================================ */
+@keyframes streakPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+.streak-fire {
+  display: inline-block;
+  animation: streakPulse 2s ease-in-out infinite;
+}
+
+/* ============================================================
+   WEAKEST PATTERNS MINI-DISPLAY
+   ============================================================ */
+.weakest-patterns-mini {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.weakest-patterns-mini h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text-secondary);
+}
+
+.weakest-pattern-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0;
+  font-size: 0.8rem;
+}
+
+.weakest-pattern-row .name {
+  flex: 1;
+  color: var(--text-primary);
+}
+
+/* ============================================================
+   ARCHIVE FILTER TOGGLE
+   ============================================================ */
+.archive-filter {
+  display: flex;
+  gap: 0;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.archive-filter-btn {
+  padding: 0.35rem 0.75rem;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: background 0.15s, color 0.15s;
+  border-right: 1px solid var(--border);
+}
+
+.archive-filter-btn:last-child {
+  border-right: none;
+}
+
+.archive-filter-btn.active {
+  background: rgba(88, 166, 255, 0.15);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.archive-filter-btn:hover:not(.active) {
+  color: var(--text-primary);
+  background: rgba(88, 166, 255, 0.06);
+}
+
+/* ============================================================
+   RESPONSIVE — NEW ADDITIONS
+   ============================================================ */
+@media (max-width: 768px) {
+  .mission-breakdown {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .mission-stats {
+    flex-direction: column;
+    gap: 0.4rem;
+    align-items: flex-start;
+  }
+
+  .pattern-confidence {
+    min-width: 100px;
+  }
+
+  .patterns-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-popover {
+    position: fixed;
+    left: 1rem;
+    right: 1rem;
+    top: auto;
+    bottom: 1rem;
+  }
+}

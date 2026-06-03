@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { format, addDays, isSameDay, parseISO } from 'date-fns';
+import { getStrengthClass } from '../lib/reviewEngine';
 
 export default function UpcomingCalendar({ problems }) {
     const upcoming = useMemo(() => {
@@ -10,6 +11,7 @@ export default function UpcomingCalendar({ problems }) {
             const date = addDays(today, i);
             const dateStr = format(date, 'yyyy-MM-dd');
             const due = problems.filter((p) => {
+                if (p.is_archived) return false;
                 const reviewDate = typeof p.next_review_date === 'string'
                     ? parseISO(p.next_review_date)
                     : new Date(p.next_review_date);
@@ -53,7 +55,7 @@ export default function UpcomingCalendar({ problems }) {
                             {day.problems.map((p) => (
                                 <div key={p.id} className="upcoming-item">
                                     <span className="upcoming-title">{p.title}</span>
-                                    <span className={`strength-badge strength-${p.strength_status.toLowerCase()}`}>
+                                    <span className={`strength-badge strength-${getStrengthClass(p.strength_status)}`}>
                                         {p.strength_status}
                                     </span>
                                     <span className={`difficulty-badge diff-${p.difficulty.toLowerCase()}`}>

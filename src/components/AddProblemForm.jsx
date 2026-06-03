@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { addDays, format } from 'date-fns';
@@ -19,6 +19,22 @@ export default function AddProblemForm({ onProblemAdded }) {
     const [success, setSuccess] = useState('');
     const [error, setError] = useState('');
 
+    // Patterns
+    const [allPatterns, setAllPatterns] = useState([]);
+    const [selectedPatternIds, setSelectedPatternIds] = useState([]);
+
+    useEffect(() => {
+        fetchPatterns();
+    }, []);
+
+    const fetchPatterns = async () => {
+        const { data } = await supabase
+            .from('patterns')
+            .select('*')
+            .order('name', { ascending: true });
+        setAllPatterns(data || []);
+    };
+
     const addTag = (tag) => {
         const trimmed = tag.trim();
         if (trimmed && !selectedTags.includes(trimmed)) {
@@ -38,6 +54,14 @@ export default function AddProblemForm({ onProblemAdded }) {
         }
     };
 
+    const togglePattern = (patternId) => {
+        setSelectedPatternIds((prev) =>
+            prev.includes(patternId)
+                ? prev.filter((id) => id !== patternId)
+                : [...prev, patternId]
+        );
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
@@ -45,10 +69,10 @@ export default function AddProblemForm({ onProblemAdded }) {
         setLoading(true);
 
         const learnedDate = new Date(dateLearned);
-        const nextReview = addDays(learnedDate, 4);
+        const nextReview = addDays(learnedDate, 1); // First review in 1 day
 
         try {
-            const { error: insertError } = await supabase.from('problems').insert({
+            const { data: insertedProblem, error: insertError } = await supabase.from('problems').insert({
                 user_id: user.id,
                 title: title.trim(),
                 platform,
@@ -57,12 +81,23 @@ export default function AddProblemForm({ onProblemAdded }) {
                 notes: notes.trim(),
                 created_at: learnedDate.toISOString(),
                 next_review_date: format(nextReview, 'yyyy-MM-dd'),
-                interval_days: 4,
-                strength_status: 'Weak',
+                interval_days: 1,
+                strength_status: 'Forgot Completely',
                 review_count: 0,
-            });
+                review_stage: 0,
+                is_archived: false,
+            }).select().single();
 
             if (insertError) throw insertError;
+
+            // Link patterns to the problem
+            if (selectedPatternIds.length > 0 && insertedProblem) {
+                const links = selectedPatternIds.map((patternId) => ({
+                    problem_id: insertedProblem.id,
+                    pattern_id: patternId,
+                }));
+                await supabase.from('problem_patterns').insert(links);
+            }
 
             setSuccess(`"${title}" added! First review on ${format(nextReview, 'MMM d, yyyy')}`);
             setTitle('');
@@ -72,6 +107,7 @@ export default function AddProblemForm({ onProblemAdded }) {
             setTagInput('');
             setDateLearned(format(new Date(), 'yyyy-MM-dd'));
             setNotes('');
+            setSelectedPatternIds([]);
 
             if (onProblemAdded) onProblemAdded();
         } catch (err) {
@@ -156,6 +192,26 @@ export default function AddProblemForm({ onProblemAdded }) {
                         ))}
                     </div>
                 </div>
+
+                {/* Patterns Selector */}
+                {allPatterns.length > 0 && (
+                    <div className="form-group">
+                        <label>Patterns (for mastery tracking)</label>
+                        <div className="common-tags">
+                            {allPatterns.map((pattern) => (
+                                <button
+                                    key={pattern.id}
+                                    type="button"
+                                    className={`pattern-chip ${selectedPatternIds.includes(pattern.id) ? 'selected' : ''}`}
+                                    onClick={() => togglePattern(pattern.id)}
+                                >
+                                    {selectedPatternIds.includes(pattern.id) ? '✓ ' : '+ '}
+                                    {pattern.name}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 <div className="form-row">
                     <div className="form-group">

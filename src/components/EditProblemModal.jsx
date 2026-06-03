@@ -14,6 +14,8 @@ export default function EditProblemModal({ problem, onClose, onSaved }) {
     const [strengthStatus, setStrengthStatus] = useState(problem.strength_status);
     const [nextReviewDate, setNextReviewDate] = useState(problem.next_review_date || '');
     const [intervalDays, setIntervalDays] = useState(problem.interval_days);
+    const [isArchived, setIsArchived] = useState(problem.is_archived || false);
+    const [reviewStage, setReviewStage] = useState(problem.review_stage || 0);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -53,6 +55,8 @@ export default function EditProblemModal({ problem, onClose, onSaved }) {
                     strength_status: strengthStatus,
                     next_review_date: nextReviewDate,
                     interval_days: intervalDays,
+                    is_archived: isArchived,
+                    review_stage: reviewStage,
                 })
                 .eq('id', problem.id);
 
@@ -160,8 +164,8 @@ export default function EditProblemModal({ problem, onClose, onSaved }) {
                         <div className="form-group">
                             <label>Strength Status</label>
                             <div className="difficulty-group">
-                                {['Weak', 'Medium', 'Strong'].map((s) => (
-                                    <label key={s} className={`difficulty-option ${strengthStatus === s ? 'active' : ''} ${s === 'Strong' ? 'diff-easy' : s === 'Medium' ? 'diff-medium' : 'diff-hard'}`}>
+                                {['Forgot Completely', 'Hard Recall', 'Easy Recall'].map((s) => (
+                                    <label key={s} className={`difficulty-option ${strengthStatus === s ? 'active' : ''} ${s === 'Easy Recall' ? 'diff-easy' : s === 'Hard Recall' ? 'diff-medium' : 'diff-hard'}`}>
                                         <input
                                             type="radio"
                                             name="edit-strength"
@@ -195,6 +199,30 @@ export default function EditProblemModal({ problem, onClose, onSaved }) {
                             value={intervalDays}
                             onChange={(e) => setIntervalDays(parseInt(e.target.value) || 4)}
                         />
+                    </div>
+
+                    <div className="form-row">
+                        <div className="form-group">
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    checked={isArchived}
+                                    onChange={(e) => setIsArchived(e.target.checked)}
+                                />
+                                {' '}Archive this problem
+                            </label>
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="edit-review-stage">Review Stage (0-4)</label>
+                            <input
+                                id="edit-review-stage"
+                                type="number"
+                                min="0"
+                                max="4"
+                                value={reviewStage}
+                                onChange={(e) => setReviewStage(parseInt(e.target.value) || 0)}
+                            />
+                        </div>
                     </div>
 
                     <div className="modal-actions">

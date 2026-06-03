@@ -19,7 +19,7 @@ export default function Navbar({ pendingCount, section }) {
                 <div className="navbar-brand">
                     <h2>RecallStack</h2>
                     {pendingCount > 0 && (
-                        <span className="notification-badge">{pendingCount}</span>
+                        <span className="notification-badge">{pendingCount > 99 ? '99+' : pendingCount}</span>
                     )}
                 </div>
                 <div className="section-switcher">

@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { format } from 'date-fns';
+import { getStrengthClass } from '../lib/reviewEngine';
 import EditProblemModal from './EditProblemModal';
 
 export default function AllProblems({ problems, onDataChanged }) {
@@ -8,6 +9,7 @@ export default function AllProblems({ problems, onDataChanged }) {
     const [filterStrength, setFilterStrength] = useState('All');
     const [filterDifficulty, setFilterDifficulty] = useState('All');
     const [filterTag, setFilterTag] = useState('All');
+    const [filterArchive, setFilterArchive] = useState('active');
     const [sortBy, setSortBy] = useState('created_at');
     const [sortDir, setSortDir] = useState('desc');
     const [editingProblem, setEditingProblem] = useState(null);
@@ -21,6 +23,13 @@ export default function AllProblems({ problems, onDataChanged }) {
 
     const filtered = useMemo(() => {
         let result = [...problems];
+
+        // Archive filter
+        if (filterArchive === 'active') {
+            result = result.filter((p) => !p.is_archived);
+        } else if (filterArchive === 'archived') {
+            result = result.filter((p) => p.is_archived);
+        }
 
         // Search
         if (search.trim()) {
@@ -58,7 +67,7 @@ export default function AllProblems({ problems, onDataChanged }) {
         });
 
         return result;
-    }, [problems, search, filterStrength, filterDifficulty, filterTag, sortBy, sortDir]);
+    }, [problems, search, filterStrength, filterDifficulty, filterTag, filterArchive, sortBy, sortDir]);
 
     const handleSort = (col) => {
         if (sortBy === col) {
@@ -72,6 +81,14 @@ export default function AllProblems({ problems, onDataChanged }) {
     const handleDelete = async (id) => {
         if (!confirm('Delete this problem?')) return;
         const { error } = await supabase.from('problems').delete().eq('id', id);
+        if (!error && onDataChanged) onDataChanged();
+    };
+
+    const handleArchive = async (id, currentlyArchived) => {
+        const { error } = await supabase
+            .from('problems')
+            .update({ is_archived: !currentlyArchived })
+            .eq('id', id);
         if (!error && onDataChanged) onDataChanged();
     };
 
@@ -119,10 +136,10 @@ export default function AllProblems({ problems, onDataChanged }) {
                     onChange={(e) => setSearch(e.target.value)}
                 />
                 <select value={filterStrength} onChange={(e) => setFilterStrength(e.target.value)}>
-                    <option value="All">All Strength</option>
-                    <option value="Weak">Weak</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Strong">Strong</option>
+                    <option value="All">All Status</option>
+                    <option value="Forgot Completely">Forgot Completely</option>
+                    <option value="Hard Recall">Hard Recall</option>
+                    <option value="Easy Recall">Easy Recall</option>
                 </select>
                 <select value={filterDifficulty} onChange={(e) => setFilterDifficulty(e.target.value)}>
                     <option value="All">All Difficulty</option>
@@ -135,6 +152,17 @@ export default function AllProblems({ problems, onDataChanged }) {
                         <option key={t} value={t}>{t === 'All' ? 'All Tags' : t}</option>
                     ))}
                 </select>
+                <div className="archive-filter">
+                    {['active', 'archived', 'all'].map((f) => (
+                        <button
+                            key={f}
+                            className={`archive-filter-btn ${filterArchive === f ? 'active' : ''}`}
+                            onClick={() => setFilterArchive(f)}
+                        >
+                            {f === 'active' ? '📋 Active' : f === 'archived' ? '📦 Archived' : '🔍 All'}
+                        </button>
+                    ))}
+                </div>
             </div>
 
             <div className="table-container">
@@ -158,7 +186,7 @@ export default function AllProblems({ problems, onDataChanged }) {
                             </tr>
                         ) : (
                             filtered.map((p) => (
-                                <tr key={p.id}>
+                                <tr key={p.id} className={p.is_archived ? 'archived-row' : ''}>
                                     <td className="td-title">{p.title}</td>
                                     <td>{p.platform}</td>
                                     <td>
@@ -172,14 +200,18 @@ export default function AllProblems({ problems, onDataChanged }) {
                                         </div>
                                     </td>
                                     <td>
-                                        <span className={`strength-badge strength-${p.strength_status.toLowerCase()}`}>
+                                        <span className={`strength-badge strength-${getStrengthClass(p.strength_status)}`}>
                                             {p.strength_status}
                                         </span>
+                                        {p.is_archived && <span className="archived-badge">Archived</span>}
                                     </td>
                                     <td>{p.review_count}</td>
                                     <td>{p.next_review_date}</td>
                                     <td>
                                         <button className="btn btn-ghost btn-sm" onClick={() => setEditingProblem(p)}>✏️</button>
+                                        <button className="btn btn-ghost btn-sm" onClick={() => handleArchive(p.id, p.is_archived)}>
+                                            {p.is_archived ? '📤' : '📦'}
+                                        </button>
                                         <button className="btn btn-ghost btn-sm" onClick={() => handleDelete(p.id)}>🗑</button>
                                     </td>
                                 </tr>
