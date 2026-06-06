@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { format } from 'date-fns';
@@ -6,8 +6,8 @@ import ReviewCard from './ReviewCard';
 import {
     getDailyReviewQueue,
     fetchDailyLimit,
+    updateDailyLimit,
     estimateReviewTime,
-    getStrengthClass,
     DEFAULT_DAILY_LIMIT,
 } from '../lib/reviewEngine';
 
@@ -15,51 +15,87 @@ export default function TodayReviews({ onReviewed }) {
     const { user } = useAuth();
     const [allDueProblems, setAllDueProblems] = useState([]);
     const [queuedProblems, setQueuedProblems] = useState([]);
-    const [dailyLimit, setDailyLimit] = useState(DEFAULT_DAILY_LIMIT);
     const [completedCount, setCompletedCount] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [limit, setLimit] = useState(DEFAULT_DAILY_LIMIT);
+    const [inputVal, setInputVal] = useState(DEFAULT_DAILY_LIMIT.toString());
 
-    const fetchDueProblems = async () => {
-        setLoading(true);
+    // Fetch due problems and saved limit on mount
+    useEffect(() => {
+        const init = async () => {
+            setLoading(true);
 
-        // Fetch daily limit from Supabase
-        let limit = DEFAULT_DAILY_LIMIT;
-        if (user) {
-            limit = await fetchDailyLimit(supabase, user.id);
+            // Fetch saved limit from Supabase
+            let savedLimit = DEFAULT_DAILY_LIMIT;
+            if (user) {
+                savedLimit = await fetchDailyLimit(supabase, user.id);
+            }
+            setLimit(savedLimit);
+            setInputVal(savedLimit.toString());
+
+            // Fetch due problems
+            const today = format(new Date(), 'yyyy-MM-dd');
+            const { data, error } = await supabase
+                .from('problems')
+                .select('*')
+                .lte('next_review_date', today)
+                .eq('is_archived', false)
+                .order('next_review_date', { ascending: true });
+
+            if (error) {
+                console.error('Error fetching reviews:', error.message);
+                setAllDueProblems([]);
+                setQueuedProblems([]);
+            } else {
+                const due = data || [];
+                setAllDueProblems(due);
+                setQueuedProblems(getDailyReviewQueue(due, savedLimit));
+            }
+            setLoading(false);
+        };
+        init();
+    }, [user]);
+
+    // Recompute queue whenever limit changes (after initial load)
+    useEffect(() => {
+        if (!loading && allDueProblems.length > 0) {
+            setQueuedProblems(getDailyReviewQueue(allDueProblems, limit));
         }
-        setDailyLimit(limit);
+    }, [limit]);
 
+    const refetchProblems = useCallback(async () => {
         const today = format(new Date(), 'yyyy-MM-dd');
-        const { data, error } = await supabase
+        const { data } = await supabase
             .from('problems')
             .select('*')
             .lte('next_review_date', today)
             .eq('is_archived', false)
             .order('next_review_date', { ascending: true });
 
-        if (error) {
-            console.error('Error fetching reviews:', error.message);
-            setAllDueProblems([]);
-            setQueuedProblems([]);
-        } else {
-            const due = data || [];
-            setAllDueProblems(due);
-
-            // Apply priority scoring and daily limit
-            const queue = getDailyReviewQueue(due, limit);
-            setQueuedProblems(queue);
-        }
-        setLoading(false);
-    };
-
-    useEffect(() => {
-        fetchDueProblems();
-    }, []);
+        const due = data || [];
+        setAllDueProblems(due);
+        setQueuedProblems(getDailyReviewQueue(due, limit));
+    }, [limit]);
 
     const handleReviewed = () => {
         setCompletedCount((c) => c + 1);
-        fetchDueProblems();
+        refetchProblems();
         if (onReviewed) onReviewed();
+    };
+
+    const handleGoalChange = (e) => {
+        const raw = e.target.value;
+        setInputVal(raw); // Always update what's shown in the input
+
+        const parsed = parseInt(raw);
+        if (!isNaN(parsed) && parsed >= 1 && parsed <= 50) {
+            setLimit(parsed); // Instantly recompute queue via effect above
+
+            // Persist to Supabase in the background
+            if (user) {
+                updateDailyLimit(supabase, user.id, parsed);
+            }
+        }
     };
 
     if (loading) {
@@ -78,7 +114,7 @@ export default function TodayReviews({ onReviewed }) {
 
     // Progress
     const progressPct = reviewsInQueue > 0
-        ? Math.round((completedCount / reviewsInQueue) * 100)
+        ? Math.round((completedCount / (reviewsInQueue + completedCount)) * 100)
         : 0;
 
     if (totalDue === 0) {
@@ -95,8 +131,30 @@ export default function TodayReviews({ onReviewed }) {
         <div className="today-mission">
             {/* Mission Header */}
             <div className="mission-header">
-                <div className="mission-title">
-                    🎯 Today's Mission
+                <div className="mission-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                    <span>🎯 Today's Mission</span>
+                    <div style={{ fontSize: '0.9rem', fontWeight: 'normal', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <label htmlFor="daily-goal-input">Daily Goal:</label>
+                        <input
+                            id="daily-goal-input"
+                            type="number"
+                            min="1"
+                            max="50"
+                            value={inputVal}
+                            onChange={handleGoalChange}
+                            style={{
+                                width: '60px',
+                                padding: '0.3rem 0.4rem',
+                                background: 'var(--bg-tertiary)',
+                                border: '1px solid var(--border)',
+                                borderRadius: 'var(--radius-sm)',
+                                color: 'var(--text-primary)',
+                                textAlign: 'center',
+                                fontSize: '1rem',
+                                fontWeight: '600',
+                            }}
+                        />
+                    </div>
                 </div>
 
                 <div className="mission-breakdown">

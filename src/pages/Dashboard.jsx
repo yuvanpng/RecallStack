@@ -1,8 +1,7 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { format, differenceInCalendarDays, subDays, parseISO } from 'date-fns';
-import { fetchDailyLimit, updateDailyLimit, DEFAULT_DAILY_LIMIT } from '../lib/reviewEngine';
 import Navbar from '../components/Navbar';
 import StatsBar from '../components/StatsBar';
 import TodayReviews from '../components/TodayReviews';
@@ -30,11 +29,7 @@ export default function Dashboard() {
     const [streak, setStreak] = useState(0);
     const [loading, setLoading] = useState(true);
 
-    // Settings popover
-    const [showSettings, setShowSettings] = useState(false);
-    const [dailyLimit, setDailyLimit] = useState(DEFAULT_DAILY_LIMIT);
-    const [limitInput, setLimitInput] = useState(DEFAULT_DAILY_LIMIT);
-    const settingsRef = useRef(null);
+
 
     const fetchData = useCallback(async () => {
         setLoading(true);
@@ -57,13 +52,7 @@ export default function Dashboard() {
             .select('*')
             .order('confidence', { ascending: true });
 
-        // Fetch daily limit
-        let limit = DEFAULT_DAILY_LIMIT;
-        if (user) {
-            limit = await fetchDailyLimit(supabase, user.id);
-        }
-        setDailyLimit(limit);
-        setLimitInput(limit);
+
 
         const probs = problemsData || [];
         const revs = reviewsData || [];
@@ -116,15 +105,7 @@ export default function Dashboard() {
         return currentStreak;
     };
 
-    const handleSaveLimit = async () => {
-        if (!user) return;
-        const newLimit = await updateDailyLimit(supabase, user.id, limitInput);
-        setDailyLimit(newLimit);
-        setLimitInput(newLimit);
-        setShowSettings(false);
-        // Refresh to apply new limit
-        fetchData();
-    };
+
 
     const archivedCount = problems.filter((p) => p.is_archived).length;
 
@@ -154,54 +135,11 @@ export default function Dashboard() {
                             {tab.label}
                             {tab.id === 'reviews' && pendingCount > 0 && (
                                 <span className="tab-badge">
-                                    {Math.min(pendingCount, dailyLimit)}
+                                    {pendingCount}
                                 </span>
                             )}
                         </button>
                     ))}
-
-                    {/* Settings trigger */}
-                    <div style={{ marginLeft: 'auto', position: 'relative' }} ref={settingsRef}>
-                        <button
-                            className="settings-trigger"
-                            onClick={() => setShowSettings(!showSettings)}
-                        >
-                            ⚙️ {dailyLimit}/day
-                        </button>
-
-                        {showSettings && (
-                            <>
-                                <div
-                                    className="settings-overlay"
-                                    onClick={() => setShowSettings(false)}
-                                />
-                                <div className="settings-popover">
-                                    <h4>⚙️ Review Settings</h4>
-                                    <div className="form-group">
-                                        <label>Daily Review Limit</label>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                            <input
-                                                type="number"
-                                                min="1"
-                                                max="50"
-                                                value={limitInput}
-                                                onChange={(e) => setLimitInput(parseInt(e.target.value) || DEFAULT_DAILY_LIMIT)}
-                                            />
-                                            <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-                                                problems/day
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <button
-                                        className="btn btn-primary btn-full"
-                                        onClick={handleSaveLimit}
-                                    >
-                                        Save
-                                    </button>
-                                </div>
-                            </>
-                        )}
-                    </div>
                 </div>
 
                 <div className="tab-content">
